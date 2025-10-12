@@ -7,15 +7,15 @@
   "build": {
     "appId": "com.last-saviors.combat-calculator",
     "productName": "Last Saviors Combat Calculator",
-    "directiories": {
+    "directories": {  // 'directiories' 오타 수정
       "output": "dist"
     },
     "publish": [
       {
-        "provider": "github",
-        "owner": "BlueEarthCat",
+        "provider": "github",  // 명시적으로 'github' 제공자 지정
+        "owner": "blueearthcat",
         "repo": "LS-Combat-Calculator",
-        "electronUpdaterCompatibility": ">=2.16"
+        "electronUpdaterCompatibility": ">=2.16"  // 올바른 위치
       }
     ],
     "mac": {
@@ -28,8 +28,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "images/galaxia.ico", 
-      "legalTrademarks": "Last Saviors"
+      "icon": "images/galaxia.ico"
     },
     "linux": {
       "target": [
@@ -42,12 +41,10 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electorn-builder",
+    "build": "electron-builder",
     "dist": "electron-builder --publish=never",
-    "package-win": "electron-packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico",
-    "create-installer-win": "electron-installer-windows --src dist/ls_combat-calculator-win32-x64 --dest dist/installers --arch x64"
+    "package-win": "electron-packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico --asar=false"
   },
-  "keywords": [],
   "author": "BlueEarthCat",
   "license": "ISC",
   "devDependencies": {
