@@ -15,7 +15,7 @@
         "provider": "github",
         "owner": "blueearthcat",
         "repo": "LS-Combat-Calculator",
-        "electronUpdaterCompatibility": ">=2.16"
+        "token": "${{ secrets.GITHUB_TOKEN }}"
       }
     ],
     "mac": {
@@ -51,11 +51,12 @@
     "electron": "^38.2.2",
     "electron-builder": "^26.0.12",
     "electron-installer-windows": "^3.0.0",
-    "@electron/packager": "^18.3.4",
+    "@electron/packager": "^18.4.4",
     "electron-updater": "^6.6.2",
-    "rimraf": "^5.0.7",
+    "rimraf": "^5.0.10",
     "glob": "^10.4.5",
-    "@npmcli/fs": "^3.1.1" 
+    "@npmcli/fs": "^3.1.1",
+    "minimatch": "^9.0.5"
   },
   "dependencies": {
     "boolean": "^3.2.0",
