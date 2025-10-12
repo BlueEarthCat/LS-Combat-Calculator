@@ -14,7 +14,8 @@
       {
         "provider": "github",
         "owner": "BlueEarthCat",
-        "repo": "LS-Combat-Calculator"
+        "repo": "LS-Combat-Calculator",
+        "electronUpdaterCompatibility": ">=2.16"
       }
     ],
     "mac": {
@@ -23,16 +24,12 @@
     "win": {
       "target": [
         {
-        "target": "nsis",
-        "arch": ["x64"]
+          "target": "nsis",
+          "arch": ["x64"]
         }
       ],
-      "nsis": {
-        "oneClick": false,
-        "allowToChangeInstallationDirectory": true,
-        "createDesktopShortcut": true,
-        "createStartMenuShortcut": true
-      }
+      "icon": "images/galaxia.ico", 
+      "legalTrademarks": "Last Saviors"
     },
     "linux": {
       "target": [
@@ -41,8 +38,7 @@
           "arch": ["x64"]
         }
       ]
-    },
-    "electronupdatercompatibility": ">=2.16"
+    }
   },
   "scripts": {
     "start": "electron .",
