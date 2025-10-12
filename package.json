@@ -4,9 +4,51 @@
   "version": "1.0.0",
   "description": "For Minecraft 1.21.4 Server Last Saviors",
   "main": "main.js",
+  "build": {
+    "appId": "com.last-saviors.combat-calculator",
+    "productName": "Last Saviors Combat Calculator",
+    "directiories": {
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "BlueEarthCat",
+        "repo": "LS-Combat-Calculator"
+      }
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": [
+        {
+        "target": "nsis",
+        "arch": ["x64"]
+        }
+      ],
+      "nsis": {
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true
+      }
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "electronupdatercompatibility": ">=2.16"
+  },
   "scripts": {
     "start": "electron .",
-	"package-win": "electron-packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico",
+    "build": "electorn-builder",
+    "dist": "electron-builder --publish=never",
+    "package-win": "electron-packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico",
     "create-installer-win": "electron-installer-windows --src dist/ls_combat-calculator-win32-x64 --dest dist/installers --arch x64"
   },
   "keywords": [],
@@ -14,8 +56,10 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^38.2.2",
+    "electron-builder": "^26.0.12",
     "electron-installer-windows": "^3.0.0",
-    "electron-packager": "^17.1.2"
+    "electron-packager": "^17.1.2",
+    "electron-updater": "^6.6.2"
   },
   "dependencies": {
     "boolean": "^3.2.0",
