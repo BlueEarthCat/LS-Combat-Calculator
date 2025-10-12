@@ -7,15 +7,15 @@
   "build": {
     "appId": "com.last-saviors.combat-calculator",
     "productName": "Last Saviors Combat Calculator",
-    "directories": {  // 'directiories' 오타 수정
+    "directories": {  
       "output": "dist"
     },
     "publish": [
       {
-        "provider": "github",  // 명시적으로 'github' 제공자 지정
+        "provider": "github",  
         "owner": "blueearthcat",
         "repo": "LS-Combat-Calculator",
-        "electronUpdaterCompatibility": ">=2.16"  // 올바른 위치
+        "electronUpdaterCompatibility": ">=2.16"  
       }
     ],
     "mac": {
