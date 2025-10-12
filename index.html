@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전투력 계산기</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1f2937;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background-color: #374151;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #93c5fd;
+            margin: 0.8rem 0;
+        }
+        .stats-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-group {
+            flex: 1;
+            background-color: #4b5563;
+            border-radius: 6px;
+            padding: 10px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        .stat-group h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            color: #bfdbfe;
+            margin-bottom: 8px;
+        }
+        .input-area {
+            max-height: 350px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #60a5fa #4b5563;
+        }
+        .input-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .input-area::-webkit-scrollbar-thumb {
+            background-color: #60a5fa;
+            border-radius: 3px;
+        }
+        .input-area::-webkit-scrollbar-track {
+            background-color: #4b5563;
+        }
+        .skill-area {
+            max-height: 220px;
+            overflow-y: auto;
+            background-color: #4b5563;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+            scrollbar-width: thin;
+            scrollbar-color: #60a5fa #4b5563;
+            display: flex;
+            gap: 10px;
+        }
+        .skill-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .skill-area::-webkit-scrollbar-thumb {
+            background-color: #60a5fa;
+            border-radius: 3px;
+        }
+        .skill-area::-webkit-scrollbar-track {
+            background-color: #4b5563;
+        }
+        .skill-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .blessing-area {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .blessing-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .blessing-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        .blessing-button[data-state="on"] {
+            border: 2px solid #60a5fa;
+        }
+        .blessing-button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1f2937;
+            color: #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .blessing-button:hover::after {
+            opacity: 1;
+        }
+        .stat-row, .skill-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 4px;
+        }
+        .stat-label, .skill-label {
+            flex: 3;
+            text-align: left;
+            font-size: 12px;
+            color: #d1d5db;
+            padding-right: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all;
+        }
+        .stat-input, .skill-input, .skill-select {
+            flex: 1;
+            padding: 4px;
+            border: 1px solid #6b7280;
+            border-radius: 4px;
+            background-color: #1f2937;
+            color: #e5e7eb;
+            font-size: 12px;
+            max-width: 80px;
+            transition: border-color 0.2s;
+        }
+        .stat-input:focus, .skill-input:focus, .skill-select:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+        }
+        .skill-select {
+            flex: 3;
+            max-width: 150px;
+        }
+        .skill-input {
+            flex: 1;
+            max-width: 60px;
+        }
+        .skill-input:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        button {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            border: none;
+        }
+        button.calculate {
+            background-color: #2563eb;
+        }
+        button.calculate:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        button.reset {
+            background-color: #dc2626;
+        }
+        button.reset:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+        }
+        #result {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            color: #60a5fa;
+            background-color: #1f2937;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .stats-container {
+                flex-direction: column;
+            }
+            .stat-group {
+                width: 100%;
+            }
+            .blessing-area {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .blessing-button {
+                width: 50px;
+                height: 50px;
+            }
+            .stat-label, .skill-label {
+                font-size: 11px;
+            }
+            .stat-input, .skill-input, .skill-select {
+                font-size: 11px;
+                padding: 3px;
+                max-width: 70px;
+            }
+            .skill-select {
+                max-width: 120px;
+            }
+            .skill-input {
+                max-width: 50px;
+            }
+            .skill-area {
+                flex-direction: column;
+            }
+            .skill-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>전투력 계산기</h2>
+        <h3>축복 선택</h3>
+        <div class="blessing-area" id="blessingArea"></div>
+        <h3>스탯 입력</h3>
+        <div class="stats-container">
+            <div class="stat-group" id="group1">
+                <h4>공격 관련</h4>
+                <div class="input-area" id="inputArea1"></div>
+            </div>
+            <div class="stat-group" id="group2">
+                <h4>방어 관련</h4>
+                <div class="input-area" id="inputArea2"></div>
+            </div>
+            <div class="stat-group" id="group3">
+                <h4>기타</h4>
+                <div class="input-area" id="inputArea3"></div>
+            </div>
+        </div>
+        <h3>스킬 입력</h3>
+        <div class="skill-area" id="skillArea">
+            <div class="skill-column" id="skillColumn1"></div>
+            <div class="skill-column" id="skillColumn2"></div>
+        </div>
+        <div class="button-container">
+            <button class="calculate" onclick="calculateCombatPower(true)">계산하기</button>
+            <button class="reset" onclick="resetInputs()">초기화</button>
+        </div>
+        <div id="result">전투력: 0</div>
+    </div>
+
+
+    <script>
+        const stats = [
+            { name: '공격력', weight: 25 },
+            { name: '적중', weight: 200 },
+            { name: '치명타 확률', weight: 100 },
+            { name: '치명타 피해량', weight: 50 },
+            { name: '기본공격 쿨타임', weight: 150 },
+            { name: '스킬 쿨타임', weight: 300 },
+            { name: '모든 피해량', weight: 250 },
+            { name: '기본공격 피해량', weight: 100 },
+            { name: '스킬 피해량', weight: 200 },
+            { name: '모든 몬스터 피해량', weight: 200 },
+            { name: '일반 몬스터 피해량', weight: 15 },
+            { name: '영웅 몬스터 피해량', weight: 15 },
+            { name: '플레이어 피해량', weight: 100 },
+            { name: '상태이상 적중', weight: 40 },
+            { name: '방어력 상쇄', weight: 15 },
+            { name: '회피 상쇄', weight: 150 },
+            { name: '방어력', weight: 15 },
+            { name: '회피', weight: 150 },
+            { name: '받는 모든 피감', weight: 250 },
+            { name: '받는 기본공격 피감', weight: 100 },
+            { name: '받는 스킬 피감', weight: 200 },
+            { name: '받는 몬스터 피감', weight: 100 },
+            { name: '받는 플레이어 피감', weight: 100 },
+            { name: '공격력 저항', weight: 25 },
+            { name: '적중 저항', weight: 200 },
+            { name: '치명타 확률 저항', weight: 100 },
+            { name: '치명타 피해량 저항', weight: 50 },
+            { name: '기절 저항', weight: 80 },
+            { name: '기절 지속 감소', weight: 40 },
+            { name: '상태이상 저항', weight: 40 },
+            { name: '상태 지속 감소', weight: 20 },
+            { name: '최대 HP', weight: 1 },
+            { name: '이동속도', weight: 15 },
+            { name: 'HP 자연 회복량', weight: 25 },
+            { name: '물약 회복량', weight: 25 },
+            { name: '경험치 획득량', weight: 5 },
+            { name: '골드 획득량', weight: 5 },
+            { name: '드랍율', weight: 5 },
+            { name: '스킬 치유량 증가', weight: 50 },
+            { name: '스킬 보호막 증가', weight: 50 },
+            { name: '버프 지속시간 증가', weight: 25 }
+        ];
+
+        const blessings = [
+            { name: '용사의 축복', effects: { '공격력': 30, '적중': 3, '방어력': 30, '회피': 3, '최대 HP': 500 }, combatPower: 0, type: 'blessing1'},
+            { name: '현자의 축복', effects: { '경험치 획득량': 30 }, combatPower: 0, type: 'blessing2' },
+            { name: '생활의 축복', effects: { '이동속도': 10 }, combatPower: 0, type: 'blessing3' },
+            { name: '용병의 축복', effects: {}, combatPower: 0, type: 'blessing4' }
+        ];
+
+        const skillValues = {
+            normal: [300, 309, 318, 328, 361, 372, 383, 394, 405, 450, 458, 467, 476, 486, 525, 536, 547, 564, 581, 600],
+            advanced: [500, 515, 530, 546, 601, 619, 637, 656, 676, 750, 765, 781, 796, 812, 877, 895, 913, 941, 969, 1000],
+            rare: [1000, 1030, 1060, 1092, 1202, 1238, 1276, 1315, 1354, 1500, 1530, 1561, 1593, 1626, 1756, 1791, 1828, 1883, 1939, 2000],
+            heroic: [2000, 2060, 2120, 2184, 2404, 2476, 2552, 2630, 2708, 3000, 3060, 3122, 3186, 3252, 3512, 3582, 3656, 3766, 3878, 4000],
+            none: Array(20).fill(0)
+        };
+
+        const availableSkills = [
+            { name: '해제', type: 'none' },
+            { name: '일반 스킬 1', type: 'normal' },
+            { name: '일반 스킬 2', type: 'normal' },
+            { name: '일반 스킬 3', type: 'normal' },
+            { name: '고급 스킬 1', type: 'advanced' },
+            { name: '고급 스킬 2', type: 'advanced' },
+            { name: '고급 스킬 3', type: 'advanced' },
+            { name: '희귀 스킬 1', type: 'rare' },
+            { name: '희귀 스킬 2', type: 'rare' },
+            { name: '희귀 스킬 3', type: 'rare' },
+            { name: '영웅 스킬 1', type: 'heroic' },
+            { name: '영웅 스킬 2', type: 'heroic' }
+        ];
+
+        const inputArea1 = document.getElementById('inputArea1');
+        const inputArea2 = document.getElementById('inputArea2');
+        const inputArea3 = document.getElementById('inputArea3');
+        const skillArea = document.getElementById('skillArea');
+        const blessingArea = document.getElementById('blessingArea');
+        const skillColumn1 = document.getElementById('skillColumn1');
+        const skillColumn2 = document.getElementById('skillColumn2');
+        const statInputs = [];
+        const skillSelects = [];
+        const skillLevelInputs = [];
+        const blessingButtons = [];
+
+        // 축복 버튼 생성
+        blessings.forEach(blessing => {
+            const img = document.createElement('img');
+            img.className = 'blessing-button';
+            img.src = `images/${blessing.type.replace(/ /g, '_').toLowerCase()}_off.png`;
+            img.dataset.state = 'off';
+            img.dataset.name = blessing.name;
+            img.dataset.tooltip = blessing.name;
+            img.addEventListener('click', () => {
+                img.dataset.state = img.dataset.state === 'off' ? 'on' : 'off';
+                img.src = `images/${blessing.type.replace(/ /g, '_').toLowerCase()}_${img.dataset.state}.png`;
+                calculateCombatPower();
+            });
+            blessingArea.appendChild(img);
+            blessingButtons.push(img);
+        });
+
+        // 스탯 입력 필드 생성
+        stats.slice(0, 16).forEach(stat => {
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            const label = document.createElement('label');
+            label.className = 'stat-label';
+            label.textContent = stat.name;
+            row.appendChild(label);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.value = '0';
+            input.className = 'stat-input';
+            input.addEventListener('input', () => calculateCombatPower());
+            row.appendChild(input);
+            statInputs.push(input);
+            inputArea1.appendChild(row);
+        });
+
+        stats.slice(16, 31).forEach(stat => {
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            const label = document.createElement('label');
+            label.className = 'stat-label';
+            label.textContent = stat.name;
+            row.appendChild(label);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.value = '0';
+            input.className = 'stat-input';
+            input.addEventListener('input', () => calculateCombatPower());
+            row.appendChild(input);
+            statInputs.push(input);
+            inputArea2.appendChild(row);
+        });
+
+        stats.slice(31).forEach(stat => {
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            const label = document.createElement('label');
+            label.className = 'stat-label';
+            label.textContent = stat.name;
+            row.appendChild(label);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.value = '0';
+            input.className = 'stat-input';
+            input.addEventListener('input', () => calculateCombatPower());
+            row.appendChild(input);
+            statInputs.push(input);
+            inputArea3.appendChild(row);
+        });
+
+        // 고정 스킬 (기본공격, 이동기)
+        const fixedSkills = [
+            { name: '기본공격', type: 'advanced' },
+            { name: '이동기', type: 'advanced' }
+        ];
+
+
+        fixedSkills.forEach((skill, index) => {
+            const row = document.createElement('div');
+            row.className = 'skill-row';
+            const label = document.createElement('label');
+            label.className = 'skill-label';
+            label.textContent = skill.name;
+            row.appendChild(label);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '1';
+            input.max = '20';
+            input.value = '1';
+            input.className = 'skill-input';
+            input.addEventListener('input', () => calculateCombatPower());
+            row.appendChild(input);
+            skillLevelInputs.push({ input, type: skill.type, name: skill.name });
+            if (index === 0) skillColumn1.appendChild(row);
+            else skillColumn2.appendChild(row);
+        });
+
+        // 선택 스킬 8개 (스킬1~4, 스킬5~8)
+        for (let i = 0; i < 4; i++) {
+            const row1 = document.createElement('div');
+            row1.className = 'skill-row';
+            const label1 = document.createElement('label');
+            label1.className = 'skill-label';
+            label1.textContent = `스킬${i + 1}`;
+            row1.appendChild(label1);
+            const select1 = document.createElement('select');
+            select1.className = 'skill-select';
+            availableSkills.forEach(skill => {
+                const option = document.createElement('option');
+                option.value = skill.type + '|' + skill.name;
+                option.textContent = skill.name;
+                select1.appendChild(option);
+            });
+            select1.value = 'none|해제';
+            row1.appendChild(select1);
+            const input1 = document.createElement('input');
+            input1.type = 'number';
+            input1.min = '1';
+            input1.max = '20';
+            input1.value = '1';
+            input1.className = 'skill-input';
+            input1.disabled = true;
+            input1.addEventListener('input', () => calculateCombatPower());
+            row1.appendChild(input1);
+            skillSelects.push(select1);
+            skillLevelInputs.push({ input: input1, select: select1 });
+            select1.addEventListener('change', () => {
+                const selectedName = select1.value.split('|')[1];
+                if (selectedName === '해제') {
+                    input1.disabled = true;
+                } else {
+                    input1.disabled = false;
+                    const selectedNames = skillSelects.map(s => s.value.split('|')[1]);
+                    const duplicates = selectedNames.filter((name, idx) => selectedNames.indexOf(name) !== idx && name !== '해제');
+                    if (duplicates.includes(selectedName)) {
+                        alert('동일한 스킬을 중복으로 선택할 수 없습니다!');
+                        select1.value = 'none|해제';
+                        input1.disabled = true;
+                    }
+                }
+                calculateCombatPower();
+            });
+            skillColumn1.appendChild(row1);
+
+            const row2 = document.createElement('div');
+            row2.className = 'skill-row';
+            const label2 = document.createElement('label');
+            label2.className = 'skill-label';
+            label2.textContent = `스킬${i + 5}`;
+            row2.appendChild(label2);
+            const select2 = document.createElement('select');
+            select2.className = 'skill-select';
+            availableSkills.forEach(skill => {
+                const option = document.createElement('option');
+                option.value = skill.type + '|' + skill.name;
+                option.textContent = skill.name;
+                select2.appendChild(option);
+            });
+            select2.value = 'none|해제';
+            row2.appendChild(select2);
+            const input2 = document.createElement('input');
+            input2.type = 'number';
+            input2.min = '1';
+            input2.max = '20';
+            input2.value = '1';
+            input2.className = 'skill-input';
+            input2.disabled = true;
+            input2.addEventListener('input', () => calculateCombatPower());
+            row2.appendChild(input2);
+            skillSelects.push(select2);
+            skillLevelInputs.push({ input: input2, select: select2 });
+            select2.addEventListener('change', () => {
+                const selectedName = select2.value.split('|')[1];
+                if (selectedName === '해제') {
+                    input2.disabled = true;
+                } else {
+                    input2.disabled = false;
+                    const selectedNames = skillSelects.map(s => s.value.split('|')[1]);
+                    const duplicates = selectedNames.filter((name, idx) => selectedNames.indexOf(name) !== idx && name !== '해제');
+                    if (duplicates.includes(selectedName)) {
+                        alert('동일한 스킬을 중복으로 선택할 수 없습니다!');
+                        select2.value = 'none|해제';
+                        input2.disabled = true;
+                    }
+                }
+                calculateCombatPower();
+            });
+            skillColumn2.appendChild(row2);
+        }
+
+        async function calculateCombatPower(save = false) {
+            try {
+                let combatPower = 0;
+
+                // 축복 효과 적용
+                const statAdjustments = {};
+                blessings.forEach((blessing, index) => {
+                    if (blessingButtons[index].dataset.state === 'on') {
+                        if (blessing.combatPower) {
+                            combatPower += blessing.combatPower;
+                        }
+                        Object.keys(blessing.effects).forEach(stat => {
+                            statAdjustments[stat] = (statAdjustments[stat] || 0) + blessing.effects[stat];
+                        });
+                    }
+                });
+
+                // 스탯 전투력 계산 (축복 효과 제외)
+                statInputs.forEach((input, index) => {
+                    const statName = stats[index].name;
+                    let value = parseFloat(input.value);
+                    if (isNaN(value) || value < 0) {
+                        throw new Error('모든 스탯은 0 이상의 숫자여야 합니다!');
+                    }
+                    const adjustment = statAdjustments[statName] || 0;
+                    value = adjustment ? value - adjustment : value;
+                    if (value < 0) value = 0;
+                    combatPower += value * stats[index].weight;
+                });
+
+                // 스킬 전투력 계산
+                skillLevelInputs.forEach(skill => {
+                    const level = parseInt(skill.input.value);
+                    const type = skill.type || skill.select.value.split('|')[0];
+                    if (type === 'none' || skill.input.disabled) {
+                        return;
+                    }
+                    if (isNaN(level) || level < 1 || level > 20) {
+                        throw new Error('스킬 레벨은 1~20 사이의 숫자여야 합니다!');
+                    }
+                    combatPower += skillValues[type][level - 1];
+                });
+
+                document.getElementById('result').textContent = `전투력: ${combatPower.toFixed(1)}`;
+                document.getElementById('result').style.animation = 'none';
+                setTimeout(() => {
+                    document.getElementById('result').style.animation = 'fadeIn 0.5s ease-in';
+                }, 10);
+
+                if (save) {
+                    const data = {
+                        stats: statInputs.map(input => input.value),
+                        skills: skillLevelInputs.map(skill => ({
+                            type: skill.type || skill.select.value.split('|')[0],
+                            name: skill.type ? skill.name : skill.select.value.split('|')[1],
+                            level: skill.input.value,
+                            disabled: skill.input.disabled
+                        })),
+                        blessings: blessingButtons.map(button => button.dataset.state)
+                    };
+                    await window.electronAPI.saveData(data);
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function resetInputs() {
+            statInputs.forEach((input, index) => {
+                input.value = index === 0 ? '4' : index === 16 ? '4' : index === 31 ? '600' : '0';
+            });
+            skillLevelInputs.forEach((skill, index) => {
+                skill.input.value = '1';
+                if (!skill.type) {
+                    skill.select.value = 'none|해제';
+                    input.disabled = true;
+                }
+            });
+            blessingButtons.forEach(button => {
+                button.dataset.state = 'off';
+                button.src = `images/${button.dataset.name.replace(/ /g, '_').toLowerCase()}_off.png`;
+            });
+            calculateCombatPower(true);
+        }
+
+        async function loadData() {
+            const data = await window.electronAPI.loadData();
+            if (data) {
+                statInputs.forEach((input, index) => {
+                    input.value = data.stats[index] || '0';
+                });
+                skillLevelInputs.forEach((skill, index) => {
+                    if (skill.type) {
+                        skill.input.value = data.skills[index].level || '1';
+                    } else {
+                        const savedValue = `${data.skills[index].type}|${data.skills[index].name}`;
+                        skill.select.value = savedValue;
+                        skill.input.value = data.skills[index].level || '1';
+                        skill.input.disabled = data.skills[index].disabled || true;
+                    }
+                });
+                blessingButtons.forEach((button, index) => {
+                    button.dataset.state = data.blessings[index] || 'off';
+                    button.src = `images/${button.dataset.name.replace(/ /g, '_').toLowerCase()}_${button.dataset.state}.png`;
+                });
+            } else {
+                statInputs[0].value = '4'; // 공격력
+                statInputs[16].value = '4'; // 방어력
+                statInputs[31].value = '600'; // 최대 HP
+                skillLevelInputs[0].input.value = '1'; // 기본공격
+                skillLevelInputs[1].input.value = '1'; // 이동기
+            }
+            calculateCombatPower();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
