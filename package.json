@@ -7,15 +7,15 @@
   "build": {
     "appId": "com.last-saviors.combat-calculator",
     "productName": "Last Saviors Combat Calculator",
-    "directories": {  
+    "directories": {
       "output": "dist"
     },
     "publish": [
       {
-        "provider": "github",  
+        "provider": "github",
         "owner": "blueearthcat",
         "repo": "LS-Combat-Calculator",
-        "electronUpdaterCompatibility": ">=2.16"  
+        "electronUpdaterCompatibility": ">=2.16"
       }
     ],
     "mac": {
@@ -43,7 +43,7 @@
     "start": "electron .",
     "build": "electron-builder",
     "dist": "electron-builder --publish=never",
-    "package-win": "electron-packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico --asar=false"
+    "package-win": "npx @electron/packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico --asar=false"
   },
   "author": "BlueEarthCat",
   "license": "ISC",
@@ -51,8 +51,11 @@
     "electron": "^38.2.2",
     "electron-builder": "^26.0.12",
     "electron-installer-windows": "^3.0.0",
-    "electron-packager": "^17.1.2",
-    "electron-updater": "^6.6.2"
+    "@electron/packager": "^18.3.4",
+    "electron-updater": "^6.6.2",
+    "rimraf": "^5.0.7",
+    "glob": "^10.4.5",
+    "@npmcli/fs": "^3.1.1" 
   },
   "dependencies": {
     "boolean": "^3.2.0",
@@ -76,6 +79,7 @@
     "fd-slicer": "^1.1.0",
     "fs-extra": "^8.1.0",
     "get-stream": "^5.2.0",
+    "glob": "^11.0.3",
     "global-agent": "^3.0.0",
     "globalthis": "^1.0.4",
     "gopd": "^1.2.0",
@@ -89,6 +93,7 @@
     "jsonfile": "^4.0.0",
     "keyv": "^4.5.4",
     "lowercase-keys": "^2.0.0",
+    "lru-cache": "^11.2.2",
     "matcher": "^3.0.0",
     "mimic-response": "^1.0.1",
     "ms": "^2.1.3",
