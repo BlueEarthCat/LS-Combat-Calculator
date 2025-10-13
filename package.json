@@ -45,7 +45,10 @@
     "dist": "electron-builder --publish=never",
     "package-win": "npx @electron/packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico --asar=false"
   },
-  "author": "BlueEarthCat",
+  "author": {
+    "name": "BlueEarthCat",
+    "email": "doheun94@gmail.com"
+  },
   "license": "ISC",
   "devDependencies": {
     "electron": "^38.2.2",
