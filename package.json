@@ -15,7 +15,7 @@
         "provider": "github",
         "owner": "blueearthcat",
         "repo": "LS-Combat-Calculator",
-        "token": "${{ secrets.GITHUB_TOKEN }}"
+        "token": "${{ secrets.GH_TOKEN }}"
       }
     ],
     "mac": {
