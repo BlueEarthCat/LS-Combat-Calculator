@@ -1,48 +1,43 @@
 {
-  "name": "ls_combat-calculator",
-  "productName": "Last Saviors Combat Calculator",
-  "version": "1.0.0",
-  "description": "For Minecraft 1.21.4 Server Last Saviors",
+  "name": "ls-combat-calculator",
+  "version": "0.0.0",
   "main": "main.js",
+  "scripts": {
+    "build:win": "electron-builder --win nsis --publish never",
+    "build:mac": "electron-builder --mac dmg --publish never",
+    "build:linux": "electron-builder --linux AppImage deb --publish never"
+  },
   "build": {
-    "appId": "com.last-saviors.combat-calculator",
-    "productName": "Last Saviors Combat Calculator",
-    "directories": {
-      "output": "dist"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "blueearthcat",
-        "repo": "LS-Combat-Calculator"
-      }
+    "appId": "com.blueearthcat.lscombatcalculator",
+    "productName": "LS Combat Calculator",
+    "files": [
+      "index.html",
+      "main.js",
+      "preload.js",
+      "images/**",
+      "package.json"
     ],
     "mac": {
-      "target": "dmg"
+      "category": "public.app-category.utilities",
+      "artifactName": "${productName}-${version}-mac.${ext}",
+      "hardenedRuntime": false /* 서명/공증 안 할 때 */
     },
+    "dmg": { "artifactName": "${productName}-${version}.dmg" },
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
+        { "target": "nsis", "arch": ["x64"] }
       ],
-      "icon": "images/galaxia.ico"
+      "artifactName": "${productName}-${version}-win.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
     },
     "linux": {
-      "target": [
-        {
-          "target": "deb",
-          "arch": ["x64"]
-        }
-      ]
+      "category": "Utility",
+      "target": ["AppImage", "deb"],
+      "artifactName": "${productName}-${version}-${os}.${ext}"
     }
-  },
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "dist": "electron-builder --publish=never",
-    "package-win": "npx @electron/packager . ls_combat-calculator --platform=win32 --arch=x64 --out=dist --icon=images/galaxia.ico --asar=false"
   },
   "author": {
     "name": "BlueEarthCat",
