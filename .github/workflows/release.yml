@@ -30,7 +30,7 @@ jobs:
 
       - name: Build and publish for Linux
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --linux --publish=always
 
   # ==========================
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and publish for Windows
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --win --publish=always
 
   # ==========================
@@ -78,7 +78,7 @@ jobs:
 
       - name: Build and publish for macOS
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --mac --publish=always
 
   # ==========================
@@ -92,7 +92,7 @@ jobs:
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
