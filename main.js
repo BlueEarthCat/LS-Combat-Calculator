@@ -1,47 +1,48 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs/promises');
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 900,
     height: 800,
-    icon: path.join(__dirname, 'images', 'galaxia.ico'), 
+    icon: path.join(__dirname, 'images', 'galaxia.ico'),
     webPreferences: {
-      nodeIntegration: false, // 보안 강화를 위해 비활성화
+      nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
-
   win.loadFile('index.html');
 }
 
-// 저장/불러오기 처리
-const saveFile = path.join(__dirname, 'save.json');
+app.whenReady().then(() => {
+  const userDataDir = app.getPath('userData');
+  const saveFile = path.join(userDataDir, 'save.json');
 
-ipcMain.handle('save-data', (event, data) => {
-  fs.writeFileSync(saveFile, JSON.stringify(data), 'utf-8');
-  return true;
+  ipcMain.handle('save-data', async (_evt, data) => {
+    await fs.mkdir(userDataDir, { recursive: true });
+    await fs.writeFile(saveFile, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  });
+
+  ipcMain.handle('load-data', async () => {
+    try {
+      const text = await fs.readFile(saveFile, 'utf8');
+      return JSON.parse(text);
+    } catch (e) {
+      if (e.code === 'ENOENT') return null;
+      throw e;
+    }
+  });
+
+  createWindow();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
 });
-
-ipcMain.handle('load-data', () => {
-  if (fs.existsSync(saveFile)) {
-    return JSON.parse(fs.readFileSync(saveFile, 'utf-8'));
-  }
-  return null;
-});
-
-app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
