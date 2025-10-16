@@ -1,7 +1,7 @@
 {
   "name": "ls_combat-calculator",
   "productName": "Last Saviors Combat Calculator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "For Minecraft 1.21.4 Server Last Saviors",
   "main": "main.js",
   "build": {
